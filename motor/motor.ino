@@ -32,6 +32,22 @@ volatile long countRR = 0;
 unsigned long lastReport = 0;
 const unsigned long reportInterval = 100; // send every 100 ms - 10hz #use 10 to 50hz
 
+// ------------------- PID constants -------------------
+float Kp = 1.0;    // Proportional gain
+float Ki = 0.0;    // Integral gain
+float Kd = 0.1;    // Derivative gain
+
+// PID state
+long prevErrorFR = 0;
+long prevErrorRR = 0;
+long integralFR = 0;
+long integralRR = 0;
+// Set point
+int targetPWM_FL = 0;
+int targetPWM_FR = 0;
+int targetPWM_RR = 0;
+
+
 void setup() {
   // Set motor pins as outputs
   pinMode(ENA_F, OUTPUT);
@@ -106,16 +122,21 @@ void loop() {
     lastFr = fr;
     lastRr = rr;
   }
+  updatePID();
 }
 
 
-// Generic motor control
+// Motor control
 void setMotors(String direction, String speedLevel) {
   int pwmValue;
 
   if (speedLevel == "HIGH") pwmValue = 255;
   else if (speedLevel == "LOW") pwmValue = 150;
   else pwmValue = 0;
+
+  targetPWM_FL = pwmValue;
+  targetPWM_FR = pwmValue;
+  targetPWM_RR = pwmValue;
 
   // Determine pin HIGH/LOW based on direction
   int fwdA = (direction == "FORWARD") ? HIGH : (direction == "REVERSE") ? LOW : LOW;
@@ -126,22 +147,63 @@ void setMotors(String direction, String speedLevel) {
   digitalWrite(IN2_F, fwdB);
   digitalWrite(IN3_F, fwdA);
   digitalWrite(IN4_F, fwdB);
-  analogWrite(ENA_F, pwmValue);
-  analogWrite(ENB_F, pwmValue);
 
   // --- Rear Motors ---
   digitalWrite(IN1_R, fwdA);
   digitalWrite(IN2_R, fwdB);
   digitalWrite(IN3_R, fwdA);
   digitalWrite(IN4_R, fwdB);
-  analogWrite(ENA_R, pwmValue);
-  analogWrite(ENB_R, pwmValue);
 }
-// Stop function
+// Stop function - smooth stop - adjust delay for choice
 void stopMotors() {
-  setMotors("STOP", "LOW"); // PWM 0
+  for (int pwm = targetPWM_FL; pwm >= 0; pwm -= 10) {
+    analogWrite(ENA_F, pwm);
+    analogWrite(ENB_F, pwm);
+    analogWrite(ENA_R, pwm);
+    analogWrite(ENB_R, pwm);
+    delay(50);
+  }
+  setMotors("STOP", "NULL");
 }
 
+// ------------------- PID -------------------
+void updatePID() {
+    noInterrupts();
+    long fl = countFL;
+    long fr = countFR;
+    long rr = countRR;
+    interrupts();
+
+    // Calculate errors relative to FL
+    long errorFR = fl - fr;
+    long errorRR = fl - rr;
+
+    // Integral
+    integralFR += errorFR;
+    integralRR += errorRR;
+
+    // Derivative
+    long derivativeFR = errorFR - prevErrorFR;
+    long derivativeRR = errorRR - prevErrorRR;
+
+    // PID output (adjust PWM)
+    int adjustFR = Kp * errorFR + Ki * integralFR + Kd * derivativeFR;
+    int adjustRR = Kp * errorRR + Ki * integralRR + Kd * derivativeRR;
+
+    // Save previous error
+    prevErrorFR = errorFR;
+    prevErrorRR = errorRR;
+
+    // --- Apply adjustments ---
+    analogWrite(ENA_F, targetPWM_FL); // reference motor stays target PWM
+    analogWrite(ENB_F, targetPWM_FL);
+
+    analogWrite(ENA_R, constrain(targetPWM_FR + adjustFR, 0, 255));
+    analogWrite(ENB_R, constrain(targetPWM_FR + adjustFR, 0, 255));
+
+    analogWrite(ENA_R, constrain(targetPWM_RR + adjustRR, 0, 255));
+    analogWrite(ENB_R, constrain(targetPWM_RR + adjustRR, 0, 255));
+}
 
 // ------------------- Encoder ISRs -------------------
 void readEncoderFL_A() {

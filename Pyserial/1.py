@@ -6,7 +6,7 @@ arduino_port = '/dev/ttyACM0'
 baud_rate = 115200
 
 ser = serial.Serial(arduino_port, baud_rate, timeout=1)
-time.sleep(2)  # wait for Arduino to initialize
+time.sleep(2)  # Arduino initialize
 
 log_file = "encoders_log.txt"
 
@@ -16,7 +16,7 @@ if not os.path.exists(log_file):
 
 
 def send_command(cmd):
-    ser.write((cmd + '\n').encode())  # send command with newline
+    ser.write((cmd + '\n').encode())
     print(f"Running: {cmd}")
     time.sleep(0.1)  # avoid flooding
 
@@ -34,13 +34,13 @@ start_time = time.time()
 while time.time() - start_time < 5:
     log_serial()
 
-send_command("FORWARD_HIGH")
-start_time = time.time()
-while time.time() - start_time < 5:
-    log_serial()
+# send_command("FORWARD_HIGH")
+# start_time = time.time()
+# while time.time() - start_time < 5:
+#     log_serial()
 
 send_command("STOP")
-time.sleep(2)
+time.sleep(3)
 
 send_command("REVERSE")
 start_time = time.time()
@@ -48,6 +48,6 @@ while time.time() - start_time < 5:
     log_serial()
 
 send_command("STOP")
-time.sleep(2)
+time.sleep(3)
 
 ser.close()

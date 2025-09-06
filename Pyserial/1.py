@@ -39,13 +39,13 @@ while time.time() - start_time < 5:
 # while time.time() - start_time < 5:
 #     log_serial()
 
-send_command("STOP")
-time.sleep(3)
+# send_command("STOP")
+# time.sleep(3)
 
-send_command("REVERSE")
-start_time = time.time()
-while time.time() - start_time < 5:
-    log_serial()
+# send_command("REVERSE")
+# start_time = time.time()
+# while time.time() - start_time < 5:
+#     log_serial()
 
 send_command("STOP")
 time.sleep(3)

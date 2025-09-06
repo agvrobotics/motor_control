@@ -64,9 +64,9 @@ void loop() {
     String cmd = Serial.readStringUntil('\n');
     cmd.trim();
 
-    if (cmd == "FORWARD_LOW") startForward("LOW");
-    else if (cmd == "FORWARD_HIGH") startForward("HIGH");
-    else if (cmd == "REVERSE") startReverse();
+    if (cmd == "FORWARD_LOW") setMotors("FORWARD", "LOW");
+    else if (cmd == "FORWARD_HIGH") setMotors("FORWARD", "HIGH");
+    else if (cmd == "REVERSE") setMotors("REVERSE", "LOW");
     else if (cmd == "STOP") stopMotors();
   }
 
@@ -109,66 +109,39 @@ void loop() {
 }
 
 
-void startForward(String speedLevel) {
+// Generic motor control
+void setMotors(String direction, String speedLevel) {
   int pwmValue;
 
-  if (speedLevel == "HIGH") {
-    pwmValue = 255; 
-  } else { 
-    pwmValue = 150;
-  }
-  // Front motors
-  digitalWrite(IN1_F, HIGH);
-  digitalWrite(IN2_F, LOW);
-  digitalWrite(IN3_F, HIGH);
-  digitalWrite(IN4_F, LOW);
+  if (speedLevel == "HIGH") pwmValue = 255;
+  else if (speedLevel == "LOW") pwmValue = 150;
+  else pwmValue = 0;
+
+  // Determine pin HIGH/LOW based on direction
+  int fwdA = (direction == "FORWARD") ? HIGH : (direction == "REVERSE") ? LOW : LOW;
+  int fwdB = (direction == "FORWARD") ? LOW  : (direction == "REVERSE") ? HIGH : LOW;
+
+  // --- Front Motors ---
+  digitalWrite(IN1_F, fwdA);
+  digitalWrite(IN2_F, fwdB);
+  digitalWrite(IN3_F, fwdA);
+  digitalWrite(IN4_F, fwdB);
   analogWrite(ENA_F, pwmValue);
   analogWrite(ENB_F, pwmValue);
 
-  // Rear motors
-  digitalWrite(IN1_R, HIGH);
-  digitalWrite(IN2_R, LOW);
-  digitalWrite(IN3_R, HIGH);
-  digitalWrite(IN4_R, LOW);
+  // --- Rear Motors ---
+  digitalWrite(IN1_R, fwdA);
+  digitalWrite(IN2_R, fwdB);
+  digitalWrite(IN3_R, fwdA);
+  digitalWrite(IN4_R, fwdB);
   analogWrite(ENA_R, pwmValue);
   analogWrite(ENB_R, pwmValue);
 }
-
-void startReverse() {
-  int pwmValue = 135;
-  // Front motors (reverse)
-  digitalWrite(IN1_F, LOW);
-  digitalWrite(IN2_F, HIGH);
-  digitalWrite(IN3_F, LOW);
-  digitalWrite(IN4_F, HIGH);
-  analogWrite(ENA_F, pwmValue);
-  analogWrite(ENB_F, pwmValue);
-
-  // Rear motors (reverse)
-  digitalWrite(IN1_R, LOW);
-  digitalWrite(IN2_R, HIGH);
-  digitalWrite(IN3_R, LOW);
-  digitalWrite(IN4_R, HIGH);
-  analogWrite(ENA_R, pwmValue);
-  analogWrite(ENB_R, pwmValue);
-}
-
+// Stop function
 void stopMotors() {
-  analogWrite(ENA_F, 0);
-  analogWrite(ENB_F, 0);
-  analogWrite(ENA_R, 0);
-  analogWrite(ENB_R, 0);
-
-  digitalWrite(IN1_F, LOW);
-  digitalWrite(IN2_F, LOW);
-  digitalWrite(IN3_F, LOW);
-  digitalWrite(IN4_F, LOW);
-
-  digitalWrite(IN1_R, LOW);
-  digitalWrite(IN2_R, LOW);
-  digitalWrite(IN3_R, LOW);
-  digitalWrite(IN4_R, LOW);
+  setMotors("STOP", "LOW"); // PWM 0
 }
+
 
 // ------------------- Encoder ISRs -------------------
 void readEncoderFL_A() {

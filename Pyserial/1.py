@@ -17,7 +17,7 @@ if not os.path.exists(log_file):
 
 def send_command(cmd):
     ser.write((cmd + '\n').encode())  # send command with newline
-    print(f"Starting: {cmd}")
+    print(f"Running: {cmd}")
     time.sleep(0.1)  # avoid flooding
 
 

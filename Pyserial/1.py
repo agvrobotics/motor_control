@@ -18,7 +18,7 @@ send_command("FORWARD_LOW")
 time.sleep(5)
 
 send_command("FORWARD_HIGH")
-time.sleep(10)
+time.sleep(5)
 
 send_command("STOP")
 time.sleep(2)

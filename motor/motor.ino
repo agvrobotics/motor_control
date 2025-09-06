@@ -30,7 +30,7 @@ volatile long countRR = 0;
 
 // ------------------- Report timing -------------------
 unsigned long lastReport = 0;
-const unsigned long reportInterval = 100; // send every 100 ms
+const unsigned long reportInterval = 100; // send every 100 ms - 10hz #use 10 to 50hz
 
 void setup() {
   // Set motor pins as outputs

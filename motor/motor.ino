@@ -43,6 +43,18 @@ void setup() {
   Serial.begin(115200);
 }
 
+void loop() {
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+    cmd.trim(); // remove newline
+
+    if (cmd == "FORWARD_LOW") startForward("LOW");
+    else if (cmd == "FORWARD_HIGH") startForward("HIGH");
+    else if (cmd == "REVERSE") startReverse();
+    else if (cmd == "STOP") stopMotors();
+  }
+}
+
 void startForward(String speedLevel) {
   int pwmValue;
 
@@ -86,4 +98,22 @@ void startReverse() {
   analogWrite(ENA_R, pwmValue);
   analogWrite(ENB_R, pwmValue);
 }
+
+void stopMotors() {
+  analogWrite(ENA_F, 0);
+  analogWrite(ENB_F, 0);
+  analogWrite(ENA_R, 0);
+  analogWrite(ENB_R, 0);
+
+  digitalWrite(IN1_F, LOW);
+  digitalWrite(IN2_F, LOW);
+  digitalWrite(IN3_F, LOW);
+  digitalWrite(IN4_F, LOW);
+
+  digitalWrite(IN1_R, LOW);
+  digitalWrite(IN2_R, LOW);
+  digitalWrite(IN3_R, LOW);
+  digitalWrite(IN4_R, LOW);
+}
+
 

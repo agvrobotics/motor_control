@@ -23,6 +23,15 @@
 #define IN3_R 28
 #define IN4_R 29
 
+// ------------------- Counters -------------------
+volatile long countFL = 0;
+volatile long countFR = 0;
+volatile long countRR = 0;
+
+// ------------------- Report timing -------------------
+unsigned long lastReport = 0;
+const unsigned long reportInterval = 100; // send every 100 ms
+
 void setup() {
   // Set motor pins as outputs
   pinMode(ENA_F, OUTPUT);
@@ -39,21 +48,66 @@ void setup() {
   pinMode(IN3_R, OUTPUT);
   pinMode(IN4_R, OUTPUT);
 
-  // Initialize serial for PySerial / ROS testing
+  // Attach interrupts
+  attachInterrupt(digitalPinToInterrupt(ENCA_FL), readEncoderFL_A, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCB_FL), readEncoderFL_B, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCA_FR), readEncoderFR_A, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCB_FR), readEncoderFR_B, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCA_RR), readEncoderRR_A, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCB_RR), readEncoderRR_B, CHANGE);
+
   Serial.begin(115200);
 }
 
 void loop() {
   if (Serial.available()) {
     String cmd = Serial.readStringUntil('\n');
-    cmd.trim(); // remove newline
+    cmd.trim();
 
     if (cmd == "FORWARD_LOW") startForward("LOW");
     else if (cmd == "FORWARD_HIGH") startForward("HIGH");
     else if (cmd == "REVERSE") startReverse();
     else if (cmd == "STOP") stopMotors();
   }
+
+  // --- Encoder Report---
+  unsigned long now = millis();
+  if (now - lastReport >= reportInterval) {
+    lastReport = now;
+
+    long fl, fr, rr;
+    noInterrupts();
+      fl = countFL;
+      fr = countFR;
+      rr = countRR;
+    interrupts();
+
+    static long lastFl = 0;
+    static long lastFr = 0;
+    static long lastRr = 0;
+
+    long dfl = fl - lastFl;
+    long dfr = fr - lastFr;
+    long drr = rr - lastRr;
+
+    // Direction: 'F' = Forward (positive delta), 'R' = Reverse (negative), 'S' = Stopped (zero)
+    char dirFL = (dfl > 0) ? 'F' : (dfl < 0) ? 'R' : 'S';
+    char dirFR = (dfr > 0) ? 'F' : (dfr < 0) ? 'R' : 'S';
+    char dirRR = (drr > 0) ? 'F' : (drr < 0) ? 'R' : 'S';
+
+    // CSV format: ENC,<FL_total>,<FL_dir>,<FR_total>,<FR_dir>,<RR_total>,<RR_dir>
+    Serial.print("ENC,");
+    Serial.print(fl); Serial.print(","); Serial.print(dirFL); Serial.print(",");
+    Serial.print(fr); Serial.print(","); Serial.print(dirFR); Serial.print(",");
+    Serial.print(rr); Serial.print(","); Serial.print(dirRR); Serial.println();
+
+    // save for next interval
+    lastFl = fl;
+    lastFr = fr;
+    lastRr = rr;
+  }
 }
+
 
 void startForward(String speedLevel) {
   int pwmValue;
@@ -114,6 +168,49 @@ void stopMotors() {
   digitalWrite(IN2_R, LOW);
   digitalWrite(IN3_R, LOW);
   digitalWrite(IN4_R, LOW);
+}
+
+// ------------------- Encoder ISRs -------------------
+void readEncoderFL_A() {
+  int a = digitalRead(ENCA_FL);
+  int b = digitalRead(ENCB_FL);
+  if (a == b) countFL++;
+  else countFL--;
+}
+
+void readEncoderFL_B() {
+  int a = digitalRead(ENCA_FL);
+  int b = digitalRead(ENCB_FL);
+  if (a != b) countFL++;
+  else countFL--;
+}
+
+void readEncoderFR_A() {
+  int a = digitalRead(ENCA_FR);
+  int b = digitalRead(ENCB_FR);
+  if (a == b) countFR++;
+  else countFR--;
+}
+
+void readEncoderFR_B() {
+  int a = digitalRead(ENCA_FR);
+  int b = digitalRead(ENCB_FR);
+  if (a != b) countFR++;
+  else countFR--;
+}
+
+void readEncoderRR_A() {
+  int a = digitalRead(ENCA_RR);
+  int b = digitalRead(ENCB_RR);
+  if (a == b) countRR++;
+  else countRR--;
+}
+
+void readEncoderRR_B() {
+  int a = digitalRead(ENCA_RR);
+  int b = digitalRead(ENCB_RR);
+  if (a != b) countRR++;
+  else countRR--;
 }
 
 

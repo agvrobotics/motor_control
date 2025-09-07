@@ -113,10 +113,10 @@ void loop() {
     char dirRR = (drr > 0) ? 'F' : (drr < 0) ? 'R' : 'S';
 
     // CSV format: ENC,<FL_total>,<FL_dir>,<FR_total>,<FR_dir>,<RR_total>,<RR_dir>
-    Serial.print("ENC,");
-    Serial.print(fl); Serial.print(","); Serial.print(dirFL); Serial.print(",");
-    Serial.print(fr); Serial.print(","); Serial.print(dirFR); Serial.print(",");
-    Serial.print(rr); Serial.print(","); Serial.print(dirRR); Serial.println();
+    // Serial.print("ENC,");
+    // Serial.print(fl); Serial.print(","); Serial.print(dirFL); Serial.print(",");
+    // Serial.print(fr); Serial.print(","); Serial.print(dirFR); Serial.print(",");
+    // Serial.print(rr); Serial.print(","); Serial.print(dirRR); Serial.println();
 
     // save for next interval
     lastFl = fl;

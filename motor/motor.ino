@@ -30,7 +30,7 @@ volatile long countRR = 0;
 
 // ------------------- Report timing -------------------
 unsigned long lastReport = 0;
-const unsigned long reportInterval = 100; // send every 100 ms - 10hz #use 10 to 50hz
+const unsigned long reportInterval = 20; // use 10 to 50hz
 
 // ------------------- PID constants -------------------
 float Kp = 1.0;    // Proportional gain

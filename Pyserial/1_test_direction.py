@@ -34,10 +34,10 @@ start_time = time.time()
 while time.time() - start_time < 5:
     log_serial()
 
-# send_command("FORWARD_HIGH")
-# start_time = time.time()
-# while time.time() - start_time < 5:
-#     log_serial()
+send_command("FORWARD_HIGH")
+start_time = time.time()
+while time.time() - start_time < 5:
+    log_serial()
 
 send_command("STOP")
 time.sleep(3)

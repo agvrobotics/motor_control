@@ -47,6 +47,7 @@ int targetPWM_FL = 0;
 int targetPWM_FR = 0;
 int targetPWM_RR = 0;
 
+String Direction = "STOP";
 
 void setup() {
   // Set motor pins as outputs
@@ -137,6 +138,7 @@ void setMotors(String direction, String speedLevel) {
   targetPWM_FL = pwmValue;
   targetPWM_FR = pwmValue;
   targetPWM_RR = pwmValue;
+  Direction = direction;
 
   // Determine pin HIGH/LOW based on direction
   int fwdA = (direction == "FORWARD") ? HIGH : (direction == "REVERSE") ? LOW : LOW;
@@ -153,6 +155,12 @@ void setMotors(String direction, String speedLevel) {
   digitalWrite(IN2_R, fwdB);
   digitalWrite(IN3_R, fwdA);
   digitalWrite(IN4_R, fwdB);
+
+  // analogWrite(ENA_F, pwmValue);
+  // analogWrite(ENB_F, pwmValue);
+  // analogWrite(ENA_R, pwmValue);
+  // analogWrite(ENB_R, pwmValue);
+
 }
 // Stop function - smooth stop - adjust delay for choice
 void stopMotors() {
@@ -175,8 +183,18 @@ void updatePID() {
     interrupts();
 
     // Calculate errors relative to FL
-    long errorFR = fl - fr;
-    long errorRR = fl - rr;
+    long errorFR, errorRR;
+    if (Direction == "FORWARD") {
+      errorFR = fl - fr;
+      errorRR = fl - rr;
+    } else if (Direction == "REVERSE") {
+      // In reverse, counts decrease, so flip the subtraction
+      errorFR = fr - fl;
+      errorRR = rr - fl;
+    } else {
+      errorFR = 0;
+      errorRR = 0;
+    }
 
     // Integral
     integralFR += errorFR;
@@ -196,12 +214,7 @@ void updatePID() {
 
     // --- Apply adjustments ---
     analogWrite(ENA_F, targetPWM_FL); // reference motor stays target PWM
-    analogWrite(ENB_F, targetPWM_FL);
-
-    analogWrite(ENA_R, constrain(targetPWM_FR + adjustFR, 0, 255));
-    analogWrite(ENB_R, constrain(targetPWM_FR + adjustFR, 0, 255));
-
-    analogWrite(ENA_R, constrain(targetPWM_RR + adjustRR, 0, 255));
+    analogWrite(ENB_F, constrain(targetPWM_FR + adjustFR, 0, 255));
     analogWrite(ENB_R, constrain(targetPWM_RR + adjustRR, 0, 255));
 }
 

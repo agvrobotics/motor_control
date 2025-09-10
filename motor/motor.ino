@@ -123,7 +123,7 @@ void loop() {
     lastFr = fr;
     lastRr = rr;
   }
-  updatePID();
+  // updatePID();
 }
 
 
@@ -156,10 +156,10 @@ void setMotors(String direction, String speedLevel) {
   digitalWrite(IN3_R, fwdA);
   digitalWrite(IN4_R, fwdB);
 
-  // analogWrite(ENA_F, pwmValue);
-  // analogWrite(ENB_F, pwmValue);
-  // analogWrite(ENA_R, pwmValue);
-  // analogWrite(ENB_R, pwmValue);
+  analogWrite(ENA_F, pwmValue);
+  analogWrite(ENB_F, pwmValue);
+  analogWrite(ENA_R, pwmValue);
+  analogWrite(ENB_R, pwmValue);
 
 }
 // Stop function - smooth stop - adjust delay for choice

@@ -33,7 +33,7 @@ class TeleopSerial(Node):
         if dr:
             key = sys.stdin.read(1)
             if key == 'w':
-                self.send_cmd("FORWARD_LOW")
+                self.send_cmd("FORWARD_HIGH")
             elif key == 's':
                 self.send_cmd("REVERSE")
             elif key == ' ':

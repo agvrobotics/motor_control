@@ -20,7 +20,7 @@ class SerialNode(Node):
         linear = msg.linear.x
         angular = msg.angular.z
         cmd_str = f"{linear},{angular}\n"
-        self.get_logger().info(f"Received Twist -> linear: {linear:.2f}, angular: {angular:.2f}")
+        self.get_logger().info(f"linear: {linear:.2f}, angular: {angular:.2f}")
         self.ser.write(cmd_str.encode('utf-8'))
 
 def main(args=None):

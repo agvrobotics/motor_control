@@ -5,3 +5,7 @@ ros_ws/log
 Serial/Motion_V1/ros_ws/build
 Serial/Motion_V1/ros_ws/install
 Serial/Motion_V1/ros_ws/log
+
+Serial/Motion_V2/ros_ws/build
+Serial/Motion_V2/ros_ws/install
+Serial/Motion_V2/ros_ws/log

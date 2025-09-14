@@ -7,14 +7,21 @@ import serial
 class SerialNode(Node):
     def __init__(self):
         super().__init__('serial_node')
-        self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0.1)
+
+        self.declare_parameter('port', '/dev/ttyACM0')
+        self.declare_parameter('baudrate', 115200)
+
+        port = self.get_parameter('port').get_parameter_value().string_value
+        baudrate = self.get_parameter('baudrate').get_parameter_value().integer_value
+
+        self.ser = serial.Serial(port, baudrate, timeout=0.1)
         self.subscription = self.create_subscription(
             Twist,
             'cmd_vel',
             self.cmd_vel_callback,
             10
         )
-        self.get_logger().info("Serial node connected to Arduino on /dev/ttyACM0")
+        self.get_logger().info(f"Serial node connected to Arduino on {port}")
 
     def cmd_vel_callback(self, msg: Twist):
         linear = msg.linear.x

@@ -93,12 +93,15 @@ void setMotorPWM(float linear, float angular) {
   const float WHEEL_BASE = 0.2325;
   const int MAX_PWM = 255;
 
-  float v_left  = linear - (angular * WHEEL_BASE / 2.0);
-  float v_right = linear + (angular * WHEEL_BASE / 2.0);
+  const float LINEAR_TO_PWM = 1000; 
+  const float ANGULAR_GAIN  = 2.5;
 
-  // Scale linear velocity to PWM (example mapping, adjust as needed)
-  int pwmFL = constrain(int(v_left * 1000), -MAX_PWM, MAX_PWM);
-  int pwmFR = constrain(int(v_right * 1000), -MAX_PWM, MAX_PWM);
+  float v_left  = linear - (angular * WHEEL_BASE / 2.0 * ANGULAR_GAIN);
+  float v_right = linear + (angular * WHEEL_BASE / 2.0 * ANGULAR_GAIN);
+
+  int pwmFL = constrain(int(v_left * LINEAR_TO_PWM), -MAX_PWM, MAX_PWM);
+  int pwmFR = constrain(int(v_right * LINEAR_TO_PWM), -MAX_PWM, MAX_PWM);
+
 
   int pwmRL = pwmFL;
   int pwmRR = pwmFR; 

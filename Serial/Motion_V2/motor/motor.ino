@@ -89,7 +89,8 @@ void loop() {
 
 // ------------------- Convert cmd_vel to PWM -------------------
 void setMotorPWM(float linear, float angular) {
-  const float WHEEL_BASE = 0.2;
+  //wheelbase is the distance between the left and right wheel contact points
+  const float WHEEL_BASE = 0.2325;
   const int MAX_PWM = 255;
 
   float v_left  = linear - (angular * WHEEL_BASE / 2.0);

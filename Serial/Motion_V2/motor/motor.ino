@@ -1,10 +1,16 @@
 // ------------------- Encoder pins -------------------
-#define ENCA_FL 18
-#define ENCB_FL 19
-#define ENCA_FR 20
-#define ENCB_FR 21
-#define ENCA_RR 2
-#define ENCB_RR 3
+// Front Right
+#define ENCA_FR 2   // Green
+#define ENCB_FR 3   // Yellow
+
+// Rear Left
+#define ENCA_RL 18  // Green
+#define ENCB_RL 19  // Yellow
+
+// Rear Right
+#define ENCA_RR 20  // Yellow
+#define ENCB_RR 21  // Green
+
 
 // ------------------- Motor pins -------------------
 // Front Motors (Driver 1)
@@ -25,8 +31,8 @@
 
 
 // ------------------- Encoder counters -------------------
-volatile long countFL = 0;
 volatile long countFR = 0;
+volatile long countRL = 0;
 volatile long countRR = 0;
 
 // ------------------- Timing -------------------
@@ -43,10 +49,12 @@ void setup() {
   pinMode(IN3_R, OUTPUT); pinMode(IN4_R, OUTPUT);
 
   // Encoder interrupts
-  attachInterrupt(digitalPinToInterrupt(ENCA_FL), readEncoderFL_A, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENCB_FL), readEncoderFL_B, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCA_FR), readEncoderFR_A, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCB_FR), readEncoderFR_B, CHANGE);
+
+  attachInterrupt(digitalPinToInterrupt(ENCA_RL), readEncoderRL_A, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCB_RL), readEncoderRL_B, CHANGE);
+
   attachInterrupt(digitalPinToInterrupt(ENCA_RR), readEncoderRR_A, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCB_RR), readEncoderRR_B, CHANGE);
 
@@ -66,6 +74,16 @@ void loop() {
       angular = cmd.substring(commaIndex + 1).toFloat();
       setMotorPWM(linear, angular);
     }
+  }
+  // Report encoder counts at fixed rate
+  if (millis() - lastReport >= reportInterval) {
+    lastReport = millis();
+    Serial.print(countFR);
+    Serial.print(",");
+    Serial.print(countRL);
+    Serial.print(",");
+    Serial.print(countRR);
+    Serial.println();
   }
 }
 
@@ -106,10 +124,12 @@ void setMotorPWM(float linear, float angular) {
 
 }
 
-// ------------------- Encoder ISRs (unchanged) -------------------
-void readEncoderFL_A() { int a=digitalRead(ENCA_FL), b=digitalRead(ENCB_FL); if(a==b) countFL++; else countFL--; }
-void readEncoderFL_B() { int a=digitalRead(ENCA_FL), b=digitalRead(ENCB_FL); if(a!=b) countFL++; else countFL--; }
+// ------------------- Encoder ISRs -------------------
 void readEncoderFR_A() { int a=digitalRead(ENCA_FR), b=digitalRead(ENCB_FR); if(a==b) countFR++; else countFR--; }
 void readEncoderFR_B() { int a=digitalRead(ENCA_FR), b=digitalRead(ENCB_FR); if(a!=b) countFR++; else countFR--; }
+
+void readEncoderRL_A() { int a=digitalRead(ENCA_RL), b=digitalRead(ENCB_RL); if(a==b) countRL++; else countRL--; }
+void readEncoderRL_B() { int a=digitalRead(ENCA_RL), b=digitalRead(ENCB_RL); if(a!=b) countRL++; else countRL--; }
+
 void readEncoderRR_A() { int a=digitalRead(ENCA_RR), b=digitalRead(ENCB_RR); if(a==b) countRR++; else countRR--; }
 void readEncoderRR_B() { int a=digitalRead(ENCA_RR), b=digitalRead(ENCB_RR); if(a!=b) countRR++; else countRR--; }

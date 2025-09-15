@@ -2,45 +2,83 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 import serial
+import threading
 
-class SerialNode(Node):
-    def __init__(self):
-        super().__init__('serial_node')
-
-        self.declare_parameter('port', '/dev/ttyACM0')
-        self.declare_parameter('baudrate', 115200)
-
-        port = self.get_parameter('port').get_parameter_value().string_value
-        baudrate = self.get_parameter('baudrate').get_parameter_value().integer_value
-
-        self.ser = serial.Serial(port, baudrate, timeout=0.1)
+class SerialCmdNode(Node):
+    def __init__(self, ser):
+        super().__init__('serial_cmd_node')
+        self.ser = ser
         self.subscription = self.create_subscription(
-            Twist,
-            'cmd_vel',
-            self.cmd_vel_callback,
-            10
+            Twist, 'cmd_vel', self.cmd_vel_callback, 10
         )
-        self.get_logger().info(f"Serial node connected to Arduino on {port}")
+        self.get_logger().info("SerialCmdNode ready")
 
     def cmd_vel_callback(self, msg: Twist):
         linear = msg.linear.x
         angular = msg.angular.z
         cmd_str = f"{linear},{angular}\n"
-        self.get_logger().info(f"linear: {linear:.2f}, angular: {angular:.2f}")
+        self.get_logger().info(f"TX -> {cmd_str.strip()}")
         self.ser.write(cmd_str.encode('utf-8'))
+
+
+class SerialFeedbackNode(Node):
+    def __init__(self, ser):
+        super().__init__('serial_feedback_node')
+        self.ser = ser
+        self.pub = self.create_publisher(String, 'encoder_counts', 10)
+
+        # Start background reader
+        self.thread = threading.Thread(target=self.read_loop, daemon=True)
+        self.thread.start()
+
+        self.get_logger().info("SerialFeedbackNode ready")
+
+    def read_loop(self):
+        with open("encoder_log.csv", "w") as f:
+            f.write("FR,RL,RR\n")
+            while rclpy.ok():
+                try:
+                    line = self.ser.readline().decode('utf-8').strip()
+                    if line:
+                        self.get_logger().info(f"RX <- {line}")
+                        # publish as string
+                        msg = String()
+                        msg.data = line
+                        self.pub.publish(msg)
+
+                        # log to file
+                        f.write(line + "\n")
+                        f.flush()
+                except Exception as e:
+                    self.get_logger().warn(f"Serial read error: {e}")
+
 
 def main(args=None):
     rclpy.init(args=args)
-    node = SerialNode()
+
+    # Open serial only once, share between nodes
+    ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0.1)
+
+    cmd_node = SerialCmdNode(ser)
+    feedback_node = SerialFeedbackNode(ser)
+
+    # Spin both nodes
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(cmd_node)
+    executor.add_node(feedback_node)
+
     try:
-        rclpy.spin(node)
+        executor.spin()
     except KeyboardInterrupt:
         pass
     finally:
-        node.ser.close()
-        node.destroy_node()
+        ser.close()
+        cmd_node.destroy_node()
+        feedback_node.destroy_node()
         rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

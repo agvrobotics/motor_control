@@ -35,7 +35,7 @@ class SerialCmdNode(Node):
         linear = msg.linear.x
         angular = msg.angular.z
         cmd_str = f"{linear},{angular}\n"
-        self.get_logger().info(f"TX -> {cmd_str.strip()}")
+        # self.get_logger().info(f"TX -> {cmd_str.strip()}")
         with self.lock:
             self.ser.write(cmd_str.encode('utf-8')) 
 
@@ -64,7 +64,7 @@ class SerialFeedbackNode(Node):
                 if not line:
                     continue
 
-                self.get_logger().info(f"RX <- {line}")
+                # self.get_logger().info(f"RX <- {line}")
 
                 # Publish raw string - "123,456,789"
                 msg_raw = String()

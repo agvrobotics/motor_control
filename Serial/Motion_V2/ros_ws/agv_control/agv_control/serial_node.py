@@ -18,12 +18,14 @@ class SerialManager(Node):
         baudrate = self.get_parameter('baudrate').get_parameter_value().integer_value
 
         self.ser = serial.Serial(port, baudrate, timeout=0.1)
+        self.lock = threading.Lock()
         self.get_logger().info(f"Opened serial at {port} {baudrate}bps")
 
 class SerialCmdNode(Node):
-    def __init__(self, ser):
+    def __init__(self, ser, lock):
         super().__init__('serial_cmd_node')
         self.ser = ser
+        self.lock = lock
         self.subscription = self.create_subscription(
             Twist, 'cmd_vel', self.cmd_vel_callback, 10
         )
@@ -34,14 +36,16 @@ class SerialCmdNode(Node):
         angular = msg.angular.z
         cmd_str = f"{linear},{angular}\n"
         self.get_logger().info(f"TX -> {cmd_str.strip()}")
-        self.ser.write(cmd_str.encode('utf-8'))
+        with self.lock:
+            self.ser.write(cmd_str.encode('utf-8')) 
 
 
 class SerialFeedbackNode(Node):
-    def __init__(self, ser):
+    def __init__(self, ser, lock):
         super().__init__('serial_feedback_node')
         
         self.ser = ser
+        self.lock = lock
         self.pub_raw = self.create_publisher(String, 'encoder_counts_raw', 10)
         self.pub_enc = self.create_publisher(Int32MultiArray, 'encoder_counts', 10)
 
@@ -54,7 +58,9 @@ class SerialFeedbackNode(Node):
     def read_loop(self):
         while rclpy.ok():
             try:
-                line = self.ser.readline().decode('utf-8').strip()
+                with self.lock:
+                    line = self.ser.readline().decode('utf-8').strip()
+
                 if not line:
                     continue
 
@@ -83,8 +89,8 @@ def main(args=None):
     rclpy.init(args=args)
 
     manager = SerialManager()
-    cmd_node = SerialCmdNode(manager.ser)
-    feedback_node = SerialFeedbackNode(manager.ser)
+    cmd_node = SerialCmdNode(manager.ser, manager.lock)
+    feedback_node = SerialFeedbackNode(manager.ser, manager.lock)
 
     executor = rclpy.executors.MultiThreadedExecutor()
     executor.add_node(manager)
@@ -96,9 +102,11 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        manager.ser.close()
+        with manager.lock:
+            manager.ser.close()
         cmd_node.destroy_node()
         feedback_node.destroy_node()
+        manager.destroy_node()
         rclpy.shutdown()
 
 

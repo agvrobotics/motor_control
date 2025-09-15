@@ -6,7 +6,6 @@ def generate_launch_description():
         Node(
             package='agv_control',
             executable='serial_node',
-            name='serial_node',
             output='screen',
             parameters=[{
                'port': '/dev/ttyACM0',

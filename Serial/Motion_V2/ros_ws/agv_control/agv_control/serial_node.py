@@ -19,7 +19,7 @@ class SerialManager(Node):
 
         self.ser = serial.Serial(port, baudrate, timeout=0.1)
         self.lock = threading.Lock()
-        self.get_logger().info(f"Opened serial at {port} {baudrate}bps")
+        self.get_logger().info(f"Serial {port} {baudrate}bps ready")
 
 class SerialCmdNode(Node):
     def __init__(self, ser, lock):
@@ -107,7 +107,9 @@ def main(args=None):
         cmd_node.destroy_node()
         feedback_node.destroy_node()
         manager.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
+
 
 
 if __name__ == '__main__':

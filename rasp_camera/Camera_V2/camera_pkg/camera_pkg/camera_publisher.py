@@ -35,8 +35,6 @@ class CameraPublisher(Node):
 
         self.timer = self.create_timer(1.0 / fps, self.timer_callback)
 
-        rclpy.on_shutdown(self.cleanup)
-
         self.warned = False
 
     def timer_callback(self):
@@ -66,9 +64,15 @@ class CameraPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = CameraPublisher()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        node.get_logger().info("Shutting down camera publisher...")
+    finally:
+        node.cleanup()
+        node.destroy_node()
+        rclpy.shutdown()
+
 
 
 if __name__ == '__main__':

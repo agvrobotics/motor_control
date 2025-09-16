@@ -1,9 +1,13 @@
 __pycache__/
 *.pyc
 
-rasp_camera/build
-rasp_camera/install
-rasp_camera/log
+rasp_camera/Camera_V1/build
+rasp_camera/Camera_V1/install
+rasp_camera/Camera_V1/log
+
+rasp_camera/Camera_V2/build
+rasp_camera/Camera_V2/install
+rasp_camera/Camera_V2/log
 
 motor_control/Motion_V1/ros_ws/build
 motor_control/Motion_V1/ros_ws/install

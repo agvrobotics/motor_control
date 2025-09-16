@@ -10,8 +10,8 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {"camera_index": 0},       
-                {"frame_width": 1280},     # 1920 is full HD
-                {"frame_height": 720},     # aspect ratio consistent
+                {"frame_width": 640},    
+                {"frame_height": 480},   
                 {"fps": 30},               # lower if bandwidth is an issue
                 {"jpeg_quality": 80},      # 0–100 (higher = better image, more bandwidth)
             ]

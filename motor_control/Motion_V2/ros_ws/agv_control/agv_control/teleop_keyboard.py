@@ -26,37 +26,39 @@ class KeyboardTeleop(Node):
         dr, _, _ = select.select([sys.stdin], [], [], 0)
         if dr:
             key = sys.stdin.read(1)
-            twist = Twist()
+            if key == '\x1b': 
+                key2 = sys.stdin.read(1)
+                key3 = sys.stdin.read(1)
+                seq = key + key2 + key3
 
-            if key == ' ':
-                twist.linear.x = 0.0
-                twist.angular.z = 0.0
-
-            # Quit
-            elif key == 'q':
-                self.stop_robot()
-                self.cleanup()
-                rclpy.shutdown()
-                return
+                if seq == '\x1b[A':   # Up arrow
+                    linear, angular = self.linear_speed, 0.0
+                elif seq == '\x1b[B': # Down arrow
+                    linear, angular = -self.linear_speed, 0.0
+                elif seq == '\x1b[D': # Left arrow
+                    linear, angular = 0.0, self.angular_speed
+                elif seq == '\x1b[C': # Right arrow
+                    linear, angular = 0.0, -self.angular_speed
+                else:
+                    linear, angular = 0.0, 0.0
 
             else:
-                linear = 0.0
-                angular = 0.0
+                twist = Twist()
+                if key == ' ':
+                    linear, angular = 0.0, 0.0
+                elif key == 'q':
+                    self.stop_robot()
+                    self.cleanup()
+                    rclpy.shutdown()
+                    return
+                else:
+                    linear = angular = 0.0  # ignore other keys
 
-                if key == 'w':
-                    linear = self.linear_speed
-                elif key == 's':
-                    linear = -self.linear_speed
-
-                if key == 'a':
-                    angular = self.angular_speed
-                elif key == 'd':
-                    angular = -self.angular_speed
-
-                twist.linear.x = linear
-                twist.angular.z = angular
-
+            twist = Twist()
+            twist.linear.x = linear
+            twist.angular.z = angular
             self.pub.publish(twist)
+
 
     def stop_robot(self):
         twist = Twist()

@@ -1,4 +1,0 @@
-[console_scripts]
-keyboard_teleop = agv_control.teleop_keyboard:main
-serial_node = agv_control.serial_node:main
-

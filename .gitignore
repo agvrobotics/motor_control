@@ -1,6 +1,6 @@
-ros_ws/build
-ros_ws/install
-ros_ws/log
+rasp_camera/build
+rasp_camera/install
+rasp_camera/log
 
 Serial/Motion_V1/ros_ws/build
 Serial/Motion_V1/ros_ws/install

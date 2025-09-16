@@ -1,0 +1,18 @@
+[0.894s] Invoking command in '/home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control': PYTHONPATH=/home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/install/agv_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control/build --no-deps symlink_data
+[1.265s] running develop
+[1.485s] running egg_info
+[1.485s] writing agv_control.egg-info/PKG-INFO
+[1.486s] writing dependency_links to agv_control.egg-info/dependency_links.txt
+[1.486s] writing entry points to agv_control.egg-info/entry_points.txt
+[1.486s] writing requirements to agv_control.egg-info/requires.txt
+[1.487s] writing top-level names to agv_control.egg-info/top_level.txt
+[1.489s] reading manifest file 'agv_control.egg-info/SOURCES.txt'
+[1.491s] writing manifest file 'agv_control.egg-info/SOURCES.txt'
+[1.493s] running build_ext
+[1.493s] Creating /home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/install/agv_control/lib/python3.10/site-packages/agv-control.egg-link (link to .)
+[1.495s] Installing keyboard_teleop script to /home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/install/agv_control/lib/agv_control
+[1.495s] Installing serial_node script to /home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/install/agv_control/lib/agv_control
+[1.496s] 
+[1.496s] Installed /home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control
+[1.496s] running symlink_data
+[1.541s] Invoked command in '/home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control' returned '0': PYTHONPATH=/home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/install/agv_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/sierra-95/Documents/motor_control/Serial/Motion_V2/ros_ws/build/agv_control/build --no-deps symlink_data

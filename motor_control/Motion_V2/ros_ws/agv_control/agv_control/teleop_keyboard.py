@@ -48,11 +48,11 @@ class KeyboardTeleop(Node):
 
         ######LEFT-HANDED CONTROLS######
             else:
-                if key == ' ' or key == 's':
+                if key == ' ':
                     linear, angular = 0.0, 0.0
                 elif key == 'w':
                     linear, angular = self.linear_speed, 0.0
-                elif key == 'r':  # Reverse
+                elif key == 's':  # Reverse
                     linear, angular = -self.linear_speed * 0.5, 0.0
 
                 elif key == 'a': # Turn left in place 

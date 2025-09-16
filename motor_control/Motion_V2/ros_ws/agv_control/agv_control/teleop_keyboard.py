@@ -17,8 +17,9 @@ class KeyboardTeleop(Node):
         tty.setcbreak(sys.stdin.fileno())
 
         self.get_logger().info("Keyboard Teleop Started")
-        self.get_logger().info("Use keys: up=forward, down=back, left=left, right=right")
-        self.get_logger().info("[ / ] = arc left/right, space = stop")
+        self.get_logger().info("Use keys: up or w = forward, s = reverse")
+        self.get_logger().info("left or right = arc, space or down = stop")
+        self.get_logger().info("a = spin left, d = spin right")
 
         self.timer = self.create_timer(0.1, self.check_key)
 

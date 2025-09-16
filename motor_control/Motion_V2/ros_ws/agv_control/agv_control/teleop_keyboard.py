@@ -12,6 +12,7 @@ class KeyboardTeleop(Node):
         self.linear_speed = 0.2  # m/s
         self.angular_speed = 1.0  # rad/s
 
+        # Save terminal settings
         self.old_settings = termios.tcgetattr(sys.stdin)
         tty.setcbreak(sys.stdin.fileno())
 
@@ -19,7 +20,6 @@ class KeyboardTeleop(Node):
         self.get_logger().info("Use keys: w=forward, s=back, a=left, d=right, space=stop, q=quit")
 
         self.timer = self.create_timer(0.1, self.check_key)
-        self.active_key = None
 
     
     def check_key(self):
@@ -30,42 +30,42 @@ class KeyboardTeleop(Node):
                 key2 = sys.stdin.read(1)
                 key3 = sys.stdin.read(1)
                 seq = key + key2 + key3
-                self.active_key = seq
+
+                if seq == '\x1b[A':   # Up arrow
+                    linear, angular = self.linear_speed, 0.0
+                elif seq == '\x1b[B': # Down arrow
+                    linear, angular = -self.linear_speed, 0.0
+                elif seq == '\x1b[D': # Left arrow
+                    linear, angular = 0.0, self.angular_speed
+                elif seq == '\x1b[C': # Right arrow
+                    linear, angular = 0.0, -self.angular_speed
+                else:
+                    linear, angular = 0.0, 0.0
+
             else:
-                if key == 'q':
+                if key == ' ':
+                    linear, angular = 0.0, 0.0
+
+                elif key == '[': 
+                    linear = self.linear_speed
+                    angular = self.angular_speed * 0.5
+                elif key == ']':
+                    linear = self.linear_speed
+                    angular = -self.angular_speed * 0.5
+
+                elif key == 'q':
                     self.stop_robot()
                     self.cleanup()
-                    self.destroy_node()
                     rclpy.shutdown()
+                    self.destroy_node()
                     sys.exit(0)
                 else:
-                    self.active_key = key
+                    linear = angular = 0.0  # ignore other keys
 
-        linear, angular = self.key_to_twist(self.active_key)
-        twist = Twist()
-        twist.linear.x = linear
-        twist.angular.z = angular
-        self.pub.publish(twist)
-
-    def key_to_twist(self, key):
-        if key == '\x1b[A':   # Up
-            return self.linear_speed, 0.0
-        elif key == '\x1b[B': # Down
-            return -self.linear_speed, 0.0
-        elif key == '\x1b[D': # Left
-            return 0.0, self.angular_speed
-        elif key == '\x1b[C': # Right
-            return 0.0, -self.angular_speed
-        elif key == '[':      # Arc left
-            return self.linear_speed, self.angular_speed * 0.5
-        elif key == ']':      # Arc right
-            return self.linear_speed, -self.angular_speed * 0.5
-        elif key == ' ':      # Emergency stop
-            self.active_key = None
-            return 0.0, 0.0
-        else:
-            return 0.0, 0.0
-
+            twist = Twist()
+            twist.linear.x = linear
+            twist.angular.z = angular
+            self.pub.publish(twist)
 
 
     def stop_robot(self):

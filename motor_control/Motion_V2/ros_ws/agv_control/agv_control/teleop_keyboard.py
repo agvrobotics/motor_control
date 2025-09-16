@@ -12,7 +12,6 @@ class KeyboardTeleop(Node):
         self.linear_speed = 0.2  # m/s
         self.angular_speed = 1.0  # rad/s
 
-        # Save terminal settings
         self.old_settings = termios.tcgetattr(sys.stdin)
         tty.setcbreak(sys.stdin.fileno())
 
@@ -24,6 +23,8 @@ class KeyboardTeleop(Node):
     
     def check_key(self):
         dr, _, _ = select.select([sys.stdin], [], [], 0)
+        linear, angular = 0.0, 0.0  # default
+
         if dr:
             key = sys.stdin.read(1)
             if key == '\x1b': 
@@ -39,33 +40,23 @@ class KeyboardTeleop(Node):
                     linear, angular = 0.0, self.angular_speed
                 elif seq == '\x1b[C': # Right arrow
                     linear, angular = 0.0, -self.angular_speed
-                else:
-                    linear, angular = 0.0, 0.0
 
             else:
                 if key == ' ':
-                    linear, angular = 0.0, 0.0
-
+                    linear, angular = 0.0, 0.0  
                 elif key == '[': 
                     linear = self.linear_speed
                     angular = self.angular_speed * 0.5
-                elif key == ']':
+                elif key == ']': 
                     linear = self.linear_speed
                     angular = -self.angular_speed * 0.5
 
-                elif key == 'q':
-                    self.stop_robot()
-                    self.cleanup()
-                    rclpy.shutdown()
-                    self.destroy_node()
-                    sys.exit(0)
-                else:
-                    linear = angular = 0.0  # ignore other keys
+        # Always publish (either motion or stop)
+        twist = Twist()
+        twist.linear.x = linear
+        twist.angular.z = angular
+        self.pub.publish(twist)
 
-            twist = Twist()
-            twist.linear.x = linear
-            twist.angular.z = angular
-            self.pub.publish(twist)
 
 
     def stop_robot(self):

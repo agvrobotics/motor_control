@@ -64,7 +64,7 @@ class SerialFeedbackNode(Node):
                 if not line:
                     continue
 
-                # self.get_logger().info(f"RX <- {line}")
+                self.get_logger().info(f"RX <- {line}")
 
                 # Publish raw string - "123,456,789"
                 msg_raw = String()

@@ -46,11 +46,20 @@ class KeyboardTeleop(Node):
                 twist = Twist()
                 if key == ' ':
                     linear, angular = 0.0, 0.0
+
+                elif key == '[': 
+                    linear = self.linear_speed
+                    angular = self.angular_speed
+                elif key == ']':
+                    linear = self.linear_speed
+                    angular = -self.angular_speed
+
                 elif key == 'q':
                     self.stop_robot()
                     self.cleanup()
                     rclpy.shutdown()
-                    return
+                    self.destroy_node()
+                    sys.exit(0)
                 else:
                     linear = angular = 0.0  # ignore other keys
 

@@ -14,7 +14,7 @@ class CameraPublisher(Node):
         self.declare_parameter('frame_width', 640)
         self.declare_parameter('frame_height', 480)
         self.declare_parameter('fps', 30)
-        self.declare_parameter('jpeg_quality', 80)  # 0–100
+        self.declare_parameter('jpeg_quality', 80)
 
         index = self.get_parameter('camera_index').value
         w = self.get_parameter('frame_width').value

@@ -1,3 +1,6 @@
+__pycache__/
+*.pyc
+
 rasp_camera/build
 rasp_camera/install
 rasp_camera/log

@@ -9,7 +9,7 @@ class KeyboardTeleop(Node):
         super().__init__('keyboard_teleop')
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        self.linear_speed = 0.2  # m/s
+        self.linear_speed = 0.2   # m/s
         self.angular_speed = 1.0  # rad/s
 
         # Save terminal settings
@@ -17,56 +17,56 @@ class KeyboardTeleop(Node):
         tty.setcbreak(sys.stdin.fileno())
 
         self.get_logger().info("Keyboard Teleop Started")
-        self.get_logger().info("Use keys: w=forward, s=back, a=left, d=right, space=stop, q=quit")
+        self.get_logger().info("Use arrows or w/a/s/d for motion")
+        self.get_logger().info("[ / ] = arc left/right, space = stop, q = quit")
 
-        self.timer = self.create_timer(0.1, self.check_key)
+        self.timer = self.create_timer(0.05, self.check_key)  # 20 Hz update
+        self.active_key = None  # remember currently pressed key
 
-    
     def check_key(self):
         dr, _, _ = select.select([sys.stdin], [], [], 0)
-        if dr:
+
+        if dr:  # a key was pressed
             key = sys.stdin.read(1)
-            if key == '\x1b': 
+            if key == '\x1b':  # arrow keys
                 key2 = sys.stdin.read(1)
                 key3 = sys.stdin.read(1)
-                seq = key + key2 + key3
-
-                if seq == '\x1b[A':   # Up arrow
-                    linear, angular = self.linear_speed, 0.0
-                elif seq == '\x1b[B': # Down arrow
-                    linear, angular = -self.linear_speed, 0.0
-                elif seq == '\x1b[D': # Left arrow
-                    linear, angular = 0.0, self.angular_speed
-                elif seq == '\x1b[C': # Right arrow
-                    linear, angular = 0.0, -self.angular_speed
-                else:
-                    linear, angular = 0.0, 0.0
-
+                self.active_key = key + key2 + key3
             else:
-                if key == ' ':
-                    linear, angular = 0.0, 0.0
-
-                elif key == '[': 
-                    linear = self.linear_speed
-                    angular = self.angular_speed * 0.5
-                elif key == ']':
-                    linear = self.linear_speed
-                    angular = -self.angular_speed * 0.5
-
-                elif key == 'q':
+                if key == 'q':  # quit
                     self.stop_robot()
                     self.cleanup()
-                    rclpy.shutdown()
                     self.destroy_node()
+                    rclpy.shutdown()
                     sys.exit(0)
+                elif key == ' ':  # emergency stop
+                    self.active_key = None
                 else:
-                    linear = angular = 0.0  # ignore other keys
+                    self.active_key = key
 
-            twist = Twist()
-            twist.linear.x = linear
-            twist.angular.z = angular
-            self.pub.publish(twist)
+        # use remembered key (keeps moving while held)
+        linear, angular = self.key_to_twist(self.active_key)
 
+        twist = Twist()
+        twist.linear.x = linear
+        twist.angular.z = angular
+        self.pub.publish(twist)
+
+    def key_to_twist(self, key):
+        if key == '\x1b[A' or key == 'w':   # Up
+            return self.linear_speed, 0.0
+        elif key == '\x1b[B' or key == 's': # Down
+            return -self.linear_speed, 0.0
+        elif key == '\x1b[D' or key == 'a': # Left
+            return 0.0, self.angular_speed
+        elif key == '\x1b[C' or key == 'd': # Right
+            return 0.0, -self.angular_speed
+        elif key == '[':  # Arc left
+            return self.linear_speed, self.angular_speed * 0.5
+        elif key == ']':  # Arc right
+            return self.linear_speed, -self.angular_speed * 0.5
+        else:
+            return 0.0, 0.0
 
     def stop_robot(self):
         twist = Twist()

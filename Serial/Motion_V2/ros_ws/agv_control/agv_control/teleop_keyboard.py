@@ -9,8 +9,8 @@ class KeyboardTeleop(Node):
         super().__init__('keyboard_teleop')
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        self.linear_speed = 0.2  # m/s for forward/back
-        self.angular_speed = 1.0 # rad/s for turning
+        self.linear_speed = 0.2  # m/s
+        self.angular_speed = 1.0  # rad/s
 
         # Save terminal settings
         self.old_settings = termios.tcgetattr(sys.stdin)
@@ -21,34 +21,48 @@ class KeyboardTeleop(Node):
 
         self.timer = self.create_timer(0.1, self.check_key)
 
+    
     def check_key(self):
-        dr,dw,de = select.select([sys.stdin], [], [], 0)
+        dr, _, _ = select.select([sys.stdin], [], [], 0)
         if dr:
             key = sys.stdin.read(1)
             twist = Twist()
-            if key == 'w':
-                twist.linear.x = self.linear_speed
-                twist.angular.z = 0.0
-            elif key == 's':
-                twist.linear.x = -self.linear_speed
-                twist.angular.z = 0.0
-            elif key == 'a':
-                twist.linear.x = 0.0
-                twist.angular.z = self.angular_speed
-            elif key == 'd':
-                twist.linear.x = 0.0
-                twist.angular.z = -self.angular_speed
-            elif key == ' ':
+
+            if key == ' ':
                 twist.linear.x = 0.0
                 twist.angular.z = 0.0
+
+            # Quit
             elif key == 'q':
+                self.stop_robot()
                 self.cleanup()
                 rclpy.shutdown()
                 return
+
             else:
-                return
+                linear = 0.0
+                angular = 0.0
+
+                if key == 'w':
+                    linear = self.linear_speed
+                elif key == 's':
+                    linear = -self.linear_speed
+
+                if key == 'a':
+                    angular = self.angular_speed
+                elif key == 'd':
+                    angular = -self.angular_speed
+
+                twist.linear.x = linear
+                twist.angular.z = angular
 
             self.pub.publish(twist)
+
+    def stop_robot(self):
+        twist = Twist()
+        twist.linear.x = 0.0
+        twist.angular.z = 0.0
+        self.pub.publish(twist)
 
     def cleanup(self):
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.old_settings)
@@ -60,7 +74,7 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        pass
+        node.stop_robot()
     finally:
         node.cleanup()
         rclpy.shutdown()

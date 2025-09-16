@@ -2,10 +2,10 @@ rasp_camera/build
 rasp_camera/install
 rasp_camera/log
 
-Serial/Motion_V1/ros_ws/build
-Serial/Motion_V1/ros_ws/install
-Serial/Motion_V1/ros_ws/log
+motor_control/Motion_V1/ros_ws/build
+motor_control/Motion_V1/ros_ws/install
+motor_control/Motion_V1/ros_ws/log
 
-Serial/Motion_V2/ros_ws/build
-Serial/Motion_V2/ros_ws/install
-Serial/Motion_V2/ros_ws/log
+motor_control/Motion_V2/ros_ws/build
+motor_control/Motion_V2/ros_ws/install
+motor_control/Motion_V2/ros_ws/log

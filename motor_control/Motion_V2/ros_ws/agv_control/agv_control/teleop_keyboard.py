@@ -27,34 +27,40 @@ class KeyboardTeleop(Node):
         dr, _, _ = select.select([sys.stdin], [], [], 0)
         if dr:
             key = sys.stdin.read(1)
+            linear, angular = 0.0, 0.0 # Default
+
             if key == '\x1b': 
                 key2 = sys.stdin.read(1)
                 key3 = sys.stdin.read(1)
                 seq = key + key2 + key3
 
-                if seq == '\x1b[A':   # Up arrow
+        ######RIGHT-HANDED CONTROLS######
+                if seq == '\x1b[A': 
                     linear, angular = self.linear_speed, 0.0
-                elif seq == '\x1b[B': # Down arrow
-                    linear, angular = -self.linear_speed, 0.0
-                elif seq == '\x1b[D': # Left arrow
-                    linear, angular = 0.0, self.angular_speed
-                elif seq == '\x1b[C': # Right arrow
-                    linear, angular = 0.0, -self.angular_speed
-                else:
+                elif seq == '\x1b[B': 
                     linear, angular = 0.0, 0.0
-
-            else:
-                if key == ' ':
-                    linear, angular = 0.0, 0.0
-
-                elif key == '[': 
+                elif seq == '\x1b[D': # arc left
                     linear = self.linear_speed
                     angular = self.angular_speed * 0.5
-                elif key == ']':
+                elif seq == '\x1b[C': # arc right
                     linear = self.linear_speed
                     angular = -self.angular_speed * 0.5
+
+        ######LEFT-HANDED CONTROLS######
+            else:
+                if key == ' ' or key == 's':
+                    linear, angular = 0.0, 0.0
+                elif key == 'w':
+                    linear, angular = self.linear_speed, 0.0
+                elif key == 'r':  # Reverse
+                    linear, angular = -self.linear_speed * 0.5, 0.0
+
+                elif key == 'a': # Turn left in place 
+                    linear, angular = 0.0, self.angular_speed
+                elif key == 'd': # Turn right in place
+                    linear, angular = 0.0, -self.angular_speed
                 else:
-                    linear = angular = 0.0  # ignore other keys
+                    linear = angular = 0.0
 
             twist = Twist()
             twist.linear.x = linear

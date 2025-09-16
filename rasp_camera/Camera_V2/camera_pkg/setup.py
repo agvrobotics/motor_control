@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'camera_publisher = camera_pkg.camera_publisher:main',
+            'camera_subscriber = camera_pkg.camera_subscriber:main',
         ],
     },
 )

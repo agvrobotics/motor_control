@@ -48,10 +48,10 @@ class KeyboardTeleop(Node):
 
                 elif key == '[': 
                     linear = self.linear_speed
-                    angular = self.angular_speed * 0.5
+                    angular = self.angular_speed 
                 elif key == ']':
                     linear = self.linear_speed
-                    angular = -self.angular_speed * 0.5
+                    angular = -self.angular_speed
 
                 elif key == 'q':
                     self.stop_robot()

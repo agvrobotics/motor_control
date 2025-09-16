@@ -35,8 +35,8 @@ class KeyboardTeleop(Node):
                 if key == 'q':
                     self.stop_robot()
                     self.cleanup()
-                    rclpy.shutdown()
                     self.destroy_node()
+                    rclpy.shutdown()
                     sys.exit(0)
                 else:
                     self.active_key = key
@@ -61,6 +61,7 @@ class KeyboardTeleop(Node):
         elif key == ']':      # Arc right
             return self.linear_speed, -self.angular_speed * 0.5
         elif key == ' ':      # Emergency stop
+            self.active_key = None
             return 0.0, 0.0
         else:
             return 0.0, 0.0

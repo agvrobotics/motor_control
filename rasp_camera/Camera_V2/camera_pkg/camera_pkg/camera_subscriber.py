@@ -9,11 +9,11 @@ class CameraSubscriber(Node):
     def __init__(self):
         super().__init__('camera_subscriber')
 
-        self.declare_parameter('roi_size', 100)
+        self.declare_parameter('roi_scale', 0.9)   
         self.declare_parameter('color_threshold', 500)
         self.declare_parameter('show_image', True)
 
-        self.roi_size = self.get_parameter('roi_size').value
+        self.roi_scale = self.get_parameter('roi_scale').value
         self.color_threshold = self.get_parameter('color_threshold').value
         self.show_image = self.get_parameter('show_image').value
 
@@ -23,7 +23,6 @@ class CameraSubscriber(Node):
             self.listener_callback,
             20
         )
-
         self.color_ranges = {
             "red1":    ([0, 120, 70], [10, 255, 255]),
             "red2":    ([170, 120, 70], [180, 255, 255]),
@@ -44,9 +43,11 @@ class CameraSubscriber(Node):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         h, w, _ = hsv.shape
 
-        # Region of interest (center square)
-        half = self.roi_size // 2
-        roi = hsv[h//2-half:h//2+half, w//2-half:w//2+half]
+        roi_height = int(h * self.roi_scale)
+        roi_width  = int(w * self.roi_scale)
+        start_y = (h - roi_height) // 2
+        start_x = (w - roi_width) // 2
+        roi = hsv[start_y:start_y+roi_height, start_x:start_x+roi_width]
 
         detected_color = "None"
         for color, (lower, upper) in self.color_ranges.items():
@@ -60,7 +61,7 @@ class CameraSubscriber(Node):
         self.get_logger().info(f"Detected Color: {detected_color}")
 
         if self.show_image:
-            cv2.rectangle(frame, (w//2-half, h//2-half), (w//2+half, h//2+half), (255,255,255), 2)
+            cv2.rectangle(frame, (start_x, start_y), (start_x+roi_width, start_y+roi_height), (255,255,255), 2)
             cv2.imshow("Camera Subscriber", frame)
             cv2.waitKey(1)
 

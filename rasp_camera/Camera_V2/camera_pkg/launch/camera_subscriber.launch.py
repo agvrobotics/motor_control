@@ -9,7 +9,7 @@ def generate_launch_description():
             name='camera_subscriber',
             output='screen',
             parameters=[
-                {"roi_size": 150}, 
+                {"roi_scale": 0.5}, 
                 {"color_threshold": 500},  
                 {"show_image": True},       
             ]

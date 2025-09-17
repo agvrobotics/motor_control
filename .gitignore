@@ -16,3 +16,7 @@ motor_control/Motion_V1/ros_ws/log
 motor_control/Motion_V2/ros_ws/build
 motor_control/Motion_V2/ros_ws/install
 motor_control/Motion_V2/ros_ws/log
+
+slam/build
+slam/install
+slam/log

@@ -3,14 +3,14 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import sys, tty, termios, select
-
+  
 class KeyboardTeleop(Node):
     def __init__(self):
         super().__init__('keyboard_teleop')
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        self.linear_speed = 0.2  # m/s
-        self.angular_speed = 1.0  # rad/s
+        self.linear_speed = 0.3  # m/s
+        self.angular_speed = 2.5  # rad/s
 
         # Save terminal settings
         self.old_settings = termios.tcgetattr(sys.stdin)
@@ -54,7 +54,7 @@ class KeyboardTeleop(Node):
                 elif key == 'w':
                     linear, angular = self.linear_speed, 0.0
                 elif key == 's':  # Reverse
-                    linear, angular = -self.linear_speed * 0.5, 0.0
+                    linear, angular = -self.linear_speed, 0.0
 
                 elif key == 'a': # Turn left in place 
                     linear, angular = 0.0, self.angular_speed

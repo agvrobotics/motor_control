@@ -93,18 +93,30 @@ void setMotorPWM(float linear, float angular) {
   const float WHEEL_BASE = 0.2325;
   const int MAX_PWM = 255;
 
-  const float LINEAR_TO_PWM = 1000; 
-  const float ANGULAR_GAIN  = 2.5;
+  const float MAX_LINEAR  = 0.425;   // measured m/s
+  const float MAX_ANGULAR = 2.99;    // measured rad/s
 
-  float v_left  = linear - (angular * WHEEL_BASE / 2.0 * ANGULAR_GAIN);
-  float v_right = linear + (angular * WHEEL_BASE / 2.0 * ANGULAR_GAIN);
+  // Clip incoming commands to max
+  if (linear > MAX_LINEAR) linear = MAX_LINEAR;
+  if (linear < -MAX_LINEAR) linear = -MAX_LINEAR;
+  if (angular > MAX_ANGULAR) angular = MAX_ANGULAR;
+  if (angular < -MAX_ANGULAR) angular = -MAX_ANGULAR;
 
-  int pwmFL = constrain(int(v_left * LINEAR_TO_PWM), -MAX_PWM, MAX_PWM);
-  int pwmFR = constrain(int(v_right * LINEAR_TO_PWM), -MAX_PWM, MAX_PWM);
+  // Differential drive kinematics
+  float v_left  = linear - (angular * WHEEL_BASE / 2.0);
+  float v_right = linear + (angular * WHEEL_BASE / 2.0);
 
-
+  // Scale to PWM
+  int pwmFL = constrain(int((v_left / MAX_LINEAR) * MAX_PWM), -MAX_PWM, MAX_PWM);
+  int pwmFR = constrain(int((v_right / MAX_LINEAR) * MAX_PWM), -MAX_PWM, MAX_PWM);
   int pwmRL = pwmFL;
-  int pwmRR = pwmFR; 
+  int pwmRR = pwmFR;
+
+  // Deadzone
+  if (abs(pwmFL) < 30) pwmFL = 0;
+  if (abs(pwmFR) < 30) pwmFR = 0;
+  if (abs(pwmRL) < 30) pwmRL = 0;
+  if (abs(pwmRR) < 30) pwmRR = 0;
 
   // Front Left
   if (pwmFL >= 0) { digitalWrite(IN1_F,HIGH); digitalWrite(IN2_F,LOW); }

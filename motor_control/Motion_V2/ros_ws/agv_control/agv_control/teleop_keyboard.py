@@ -9,8 +9,8 @@ class KeyboardTeleop(Node):
         super().__init__('keyboard_teleop')
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        self.linear_speed = 0.3  # m/s
-        self.angular_speed = 2.5  # rad/s
+        self.linear_speed = 0.25  # m/s
+        self.angular_speed = 1.9  # rad/s
 
         # Save terminal settings
         self.old_settings = termios.tcgetattr(sys.stdin)

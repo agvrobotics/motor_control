@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<robot name="dekut_amr" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 
+    Each transmission connects a joint to an actuator 
+    and defines which control interfaces are available.
+    For ROS 2 Control, we use:
+      - command_interface: velocity (for wheel velocity control)
+      - state_interface: position + velocity (feedback for odom)
+  -->
+
+  <!-- Back Left Wheel -->
+  <transmission name="bl_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="bl_joint">
+      <!-- Control interface: we send velocity commands -->
+      <command_interface name="velocity"/>
+      <!-- Feedback interfaces: position + velocity from sim -->
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <actuator name="bl_joint_actr">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <!-- Back Right Wheel -->
+  <transmission name="br_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="br_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <actuator name="br_joint_actr">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <!-- Front Left Wheel -->
+  <transmission name="fl_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="fl_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <actuator name="fl_joint_actr">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <!-- Front Right Wheel -->
+  <transmission name="fr_joint_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="fr_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <actuator name="fr_joint_actr">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+</robot>

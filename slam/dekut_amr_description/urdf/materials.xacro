@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<robot name="dekut_amr" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Silver material -->
+  <material name="silver">
+    <color rgba="0.700 0.700 0.700 1.000"/>
+  </material>
+
+  <!-- Blue material -->
+  <material name="blue">
+    <color rgba="0.000 0.000 1.000 1.000"/>
+  </material>
+
+  <!-- Red material -->
+  <material name="red">
+    <color rgba="1.000 0.000 0.000 1.000"/>
+  </material>
+
+</robot>

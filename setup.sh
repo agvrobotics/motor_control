@@ -36,3 +36,11 @@ odometry topic: /odom
 
 fixed frame: map
 views: top_down
+
+
+#### NAV2 #########################
+cd ~/robodojo/slam
+
+tmux new -s nav2
+source install/setup.bash
+ros2 launch lidar_nav2 nav2.launch.py

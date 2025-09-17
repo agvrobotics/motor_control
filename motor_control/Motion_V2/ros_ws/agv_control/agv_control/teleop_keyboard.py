@@ -42,10 +42,10 @@ class KeyboardTeleop(Node):
                     linear, angular = 0.0, 0.0
                 elif seq == '\x1b[D': # arc left
                     linear = self.linear_speed
-                    angular = self.angular_speed * 0.5
+                    angular = self.angular_speed
                 elif seq == '\x1b[C': # arc right
                     linear = self.linear_speed
-                    angular = -self.angular_speed * 0.5
+                    angular = -self.angular_speed
 
         ######LEFT-HANDED CONTROLS######
             else:

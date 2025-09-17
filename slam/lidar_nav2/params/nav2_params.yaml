@@ -17,6 +17,6 @@ controller_server:
       min_vel_x: 0.15      # min forward speed (m/s)
       max_vel_x: 0.3      # max forward speed (m/s)
       min_vel_theta: 1.5   # min rotation speed (rad/s)
-      max_vel_theta: 2   # max rotation speed (rad/s)
+      max_vel_theta: 2.0   # max rotation speed (rad/s)
       acc_lim_x: 0.5       # m/s^2
       acc_lim_theta: 2.0   # rad/s^2

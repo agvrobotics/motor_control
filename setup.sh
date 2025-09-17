@@ -44,3 +44,6 @@ cd ~/robodojo/slam
 tmux new -s nav2
 source install/setup.bash
 ros2 launch lidar_nav2 nav2.launch.py
+
+
+ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=/home/agv/maps/michael.yaml

@@ -2,18 +2,24 @@
 cd ~/robodojo/motor_control/Motion_V2/ros_ws
 
 tmux new -s serial
+source install/setup.bash
 ros2 launch agv_control agv_launch.py
 
 tmux new -s teleop
+source install/setup.bash
 ros2 run agv_control keyboard_teleop
 
 
 cd ~/robodojo/slam
 #encoder info publisher(subscribes to serial)
 tmux new -s odom
+source install/setup.bash
 ros2 launch odom_pub odom_pub.launch.py
 
+cd ~/slam1/ros2_ws
+
 tmux new -s rplidar
+source install/setup.bash
 ros2 launch rplidar_ros rplidar_a1_launch.py serial_port:=/dev/ttyUSB0 serial_baudrate:=115200 frame_id:=lidar_link_1
 
 

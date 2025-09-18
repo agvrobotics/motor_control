@@ -9,8 +9,7 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory("nav2_bringup")
     bringup_launch = os.path.join(nav2_bringup_dir, "launch", "bringup_launch.py")
 
-    map_file = "/home/agv/maps/michael.yaml"
-    params_file = "/home/agv/robodojo/slam/lidar_nav2/params/nav2_params.yaml"
+    map_file = "/home/sierra-95/Documents/robodojo/slam/michael.yaml"
 
     return LaunchDescription([
         # Map server
@@ -18,7 +17,6 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(bringup_launch),
             launch_arguments={
                 "map": map_file,
-                "params_file": params_file,
                 "use_sim_time": "false"
             }.items(),
         ),

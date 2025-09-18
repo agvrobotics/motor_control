@@ -39,7 +39,7 @@ class KeyboardTeleop(Node):
                 if seq == '\x1b[A': 
                     linear, angular = self.linear_speed, 0.0
                 elif seq == '\x1b[B': 
-                    linear, angular = -self.linear_speed, 0.0
+                    linear, angular = 0.0, 0.0
                 elif seq == '\x1b[D': # arc left
                     linear = self.linear_speed
                     angular = self.angular_speed
@@ -54,7 +54,8 @@ class KeyboardTeleop(Node):
                 elif key == 'w':
                     linear, angular = self.linear_speed, 0.0
                 elif key == 's':  # Reverse
-                    linear, angular = 0.0, 0.0
+                    linear, angular = -self.linear_speed, 0.0
+
                 elif key == 'a': # Turn left in place 
                     linear, angular = 0.0, self.angular_speed
                 elif key == 'd': # Turn right in place

@@ -47,8 +47,6 @@ class SerialFeedbackNode(Node):
         self.ser = ser
         self.lock = lock
         self.pub_raw = self.create_publisher(String, 'encoder_counts_raw', 10)
-        self.pub_enc = self.create_publisher(Int32MultiArray, 'encoder_counts', 10)
-
         # Start background reader
         self.thread = threading.Thread(target=self.read_loop, daemon=True)
         self.thread.start()
@@ -66,16 +64,11 @@ class SerialFeedbackNode(Node):
 
                 # self.get_logger().info(f"RX <- {line}")
 
-                # Publish raw string - "123,456,789"
-                msg_raw = String()
-                msg_raw.data = line
-                self.pub_raw.publish(msg_raw)
-
-                # Publish structured encoder values - [123, 456, 789]
+                # Publish structured encoder values - [123, 456] -> RL,RR
                 parts = line.split(',')
-                if len(parts) == 3:
+                if len(parts) == 2:
                     try:
-                        counts = [int(parts[0]), int(parts[1]), int(parts[2])]
+                        counts = [int(parts[0]), int(parts[1])]
                         msg_enc = Int32MultiArray()
                         msg_enc.data = counts
                         self.pub_enc.publish(msg_enc)

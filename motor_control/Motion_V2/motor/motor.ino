@@ -78,8 +78,6 @@ void loop() {
   // Report encoder counts at fixed rate
   if (millis() - lastReport >= reportInterval) {
     lastReport = millis();
-    Serial.print(countFR);
-    Serial.print(",");
     Serial.print(countRL);
     Serial.print(",");
     Serial.print(countRR);

@@ -46,7 +46,7 @@ class SerialFeedbackNode(Node):
         
         self.ser = ser
         self.lock = lock
-        self.pub_raw = self.create_publisher(String, 'encoder_counts_raw', 10)
+        self.pub_enc = self.create_publisher(Int32MultiArray, 'encoder_counts', 10)
         # Start background reader
         self.thread = threading.Thread(target=self.read_loop, daemon=True)
         self.thread.start()

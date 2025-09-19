@@ -45,11 +45,11 @@ class OdomPublisher(Node):
         self.get_logger().info("Odom publisher initialized (using rear RL & RR encoders only)")
 
     def encoder_callback(self, msg: Int32MultiArray):
-        counts = msg.data  # [FR, RL, RR]
+        counts = msg.data  # [RL, RR]
         now_time = self.get_clock().now().nanoseconds * 1e-9  # seconds
 
-        if len(counts) < 3:
-            self.get_logger().warn("Encoder message must have [FR, RL, RR], got %s" % str(counts))
+        if len(counts) < 2:
+            self.get_logger().warn("Encoder message must have [RL, RR], got %s" % str(counts))
             return
 
         if self.last_counts is None:
@@ -62,8 +62,8 @@ class OdomPublisher(Node):
             return
 
         # Encoder deltas (ignore FR, use RL and RR)
-        delta_RL = counts[1] - self.last_counts[1]
-        delta_RR = counts[2] - self.last_counts[2]
+        delta_RL = counts[0] - self.last_counts[0]
+        delta_RR = counts[1] - self.last_counts[1]
 
         # Convert encoder counts to meters
         dist_RL = 2 * math.pi * self.wheel_radius * delta_RL / self.counts_per_rev

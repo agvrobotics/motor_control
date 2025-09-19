@@ -15,7 +15,7 @@ class OdomPublisher(Node):
         # Robot parameters
         self.wheel_radius = 0.0425       # meters (4.25 cm)
         self.wheel_separation = 0.232    # meters (23.2 cm between left and right wheels)
-        self.counts_per_rev = 3960       # adjust to your encoder
+        self.counts_per_rev = 4100       # adjust to your encoder
         self.turning_gain = 42
            # skid-steer correction factor (tune!)
 

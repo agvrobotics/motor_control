@@ -72,25 +72,27 @@ class OdomPublisher(Node):
         self.create_subscription(Int32MultiArray, 'encoder_counts', self.encoder_callback, 10)
 
         # Log file for debugging (optional)
-        self.log_file = os.path.expanduser('~/odom_debug_log.txt')
-        try:
-            open(self.log_file, 'w').close()
-        except Exception:
-            pass
+        # CSV log files
+        self.encoder_log_file = os.path.expanduser('~/encoder_counts.csv')
+        self.delta_log_file   = os.path.expanduser('~/deltas.csv')
+        self.vel_log_file     = os.path.expanduser('~/velocities.csv')
+
+        # Initialize CSV files with headers
+        for file, header in [(self.encoder_log_file, 'timestamp,RL,RR'),
+                            (self.delta_log_file, 'timestamp,delta_RL,delta_RR,dt'),
+                            (self.vel_log_file, 'timestamp,raw_v,raw_omega,filtered_v,filtered_omega')]:
+            try:
+                with open(file, 'w') as f:
+                    f.write(header + '\n')
+            except Exception:
+                pass
+
 
         # Timer for publishing at given rate
         period = 1.0 / max(1.0, self.publish_hz)
         self.create_timer(period, self.publish_odom)
 
         self.get_logger().info(f"OdomPublisher ready: {self.odom_frame} -> {self.base_frame} @ {self.publish_hz} Hz")
-
-    def _log(self, text: str):
-        # small helper to append to log file (non-blocking-ish)
-        try:
-            with open(self.log_file, 'a') as f:
-                f.write(text + '\n')
-        except Exception:
-            pass
 
     def encoder_callback(self, msg: Int32MultiArray):
         counts = msg.data
@@ -147,7 +149,26 @@ class OdomPublisher(Node):
         self.last_time = now
 
         # debug log line: dt, dRL, dRR, raw_v, raw_omega, v_filtered, omega_filtered
-        self._log(f"{now.nanoseconds},{dt:.6f},{delta_RL},{delta_RR},{raw_v:.6f},{raw_omega:.6f},{self.v:.6f},{self.omega:.6f}")
+        # log raw encoder counts
+        try:
+            with open(self.encoder_log_file, 'a') as f:
+                f.write(f"{now.nanoseconds},{counts[0]},{counts[1]}\n")
+        except Exception:
+            pass
+
+        # log deltas
+        try:
+            with open(self.delta_log_file, 'a') as f:
+                f.write(f"{now.nanoseconds},{delta_RL},{delta_RR},{dt:.6f}\n")
+        except Exception:
+            pass
+
+        # log velocities
+        try:
+            with open(self.vel_log_file, 'a') as f:
+                f.write(f"{now.nanoseconds},{raw_v:.6f},{raw_omega:.6f},{self.v:.6f},{self.omega:.6f}\n")
+        except Exception:
+            pass
 
     def publish_odom(self):
         now = self.get_clock().now()

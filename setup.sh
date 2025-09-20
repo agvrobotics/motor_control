@@ -30,7 +30,7 @@ ros2 launch dekut_amr_description display.launch.py
 ros2 launch lidar_slam slam.launch.py
 
 ##--------------confirm tree structure----------------##
-ros2 run tf2_tools view_frames.py
+ros2 run tf2_tools view_frames
 
 #on Rviz
 laser scan topic: /scan

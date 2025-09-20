@@ -22,8 +22,8 @@ def generate_launch_description():
 
                 # Fast, frequent updates
                 'map_update_interval': 0.02,         # map integration frequency
-                'minimum_travel_distance': 0.003,    # update after 1 cm
-                'minimum_travel_heading': 0.01,     # update after 0.5°
+                'minimum_travel_distance': 0.03,    # update after 3 cm
+                'minimum_travel_heading': 0.02,     # update after 2°
 
                 # Scan matching improves smoothness
                 'use_scan_matching': True,

@@ -73,6 +73,10 @@ class OdomPublisher(Node):
         left_dist = dist_RL
         right_dist = dist_RR
 
+        omega_raw = (right_dist - left_dist) / self.wheel_separation
+        self.get_logger().info(
+            f"omega_raw={omega_raw:.3f}, omega_scaled={omega_raw * self.turning_gain:.3f}"
+        )       
         # Velocities
         self.v = (left_dist + right_dist) / (2.0 * dt)
         self.omega = ((right_dist - left_dist) / self.wheel_separation) * self.turning_gain

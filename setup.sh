@@ -29,6 +29,9 @@ source install/setup.bash
 ros2 launch dekut_amr_description display.launch.py
 ros2 launch lidar_slam slam.launch.py
 
+##--------------confirm tree structure----------------##
+ros2 run tf2_tools view_frames.py
+
 #on Rviz
 laser scan topic: /scan
 map topic: /map

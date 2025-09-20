@@ -76,11 +76,17 @@ class OdomPublisher(Node):
         self.encoder_log_file = os.path.expanduser('~/encoder_counts.csv')
         self.delta_log_file   = os.path.expanduser('~/deltas.csv')
         self.vel_log_file     = os.path.expanduser('~/velocities.csv')
+        self.dist_log_file    = os.path.expanduser('~/distances.csv')
+        self.omega_scaled_log_file = os.path.expanduser('~/omega_scaled.csv')
+        self.pose_log_file    = os.path.expanduser('~/pose.csv')
 
         # Initialize CSV files with headers
         for file, header in [(self.encoder_log_file, 'timestamp,RL,RR'),
                             (self.delta_log_file, 'timestamp,delta_RL,delta_RR,dt'),
-                            (self.vel_log_file, 'timestamp,raw_v,raw_omega,filtered_v,filtered_omega')]:
+                            (self.vel_log_file, 'timestamp,raw_v,raw_omega,filtered_v,filtered_omega'),
+                            (self.dist_log_file, 'timestamp,dist_RL,dist_RR,left_dist,right_dist'),
+                            (self.omega_scaled_log_file, 'timestamp,raw_omega,omega_scaled'),
+                            (self.pose_log_file, 'timestamp,x,y,theta')]:
             try:
                 with open(file, 'w') as f:
                     f.write(header + '\n')
@@ -167,6 +173,25 @@ class OdomPublisher(Node):
         try:
             with open(self.vel_log_file, 'a') as f:
                 f.write(f"{now.nanoseconds},{raw_v:.6f},{raw_omega:.6f},{self.v:.6f},{self.omega:.6f}\n")
+        except Exception:
+            pass
+        try:
+            with open(self.dist_log_file, 'a') as f:
+                f.write(f"{now.nanoseconds},{dist_RL:.6f},{dist_RR:.6f},{left_dist:.6f},{right_dist:.6f}\n")
+        except Exception:
+            pass
+
+        # log scaled omega
+        try:
+            with open(self.omega_scaled_log_file, 'a') as f:
+                f.write(f"{now.nanoseconds},{raw_omega:.6f},{omega_scaled:.6f}\n")
+        except Exception:
+            pass
+
+        # log pose updates
+        try:
+            with open(self.pose_log_file, 'a') as f:
+                f.write(f"{now.nanoseconds},{self.x:.6f},{self.y:.6f},{self.theta:.6f}\n")
         except Exception:
             pass
 

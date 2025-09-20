@@ -8,6 +8,8 @@ import tf_transformations
 from tf2_ros import TransformBroadcaster
 import math
 
+import os
+
 class OdomPublisher(Node):
     def __init__(self):
         super().__init__('odom_publisher')
@@ -43,6 +45,10 @@ class OdomPublisher(Node):
         self.create_timer(0.02, self.publish_odom)
 
         self.get_logger().info("Odom publisher initialized (using rear RL & RR encoders only)")
+        
+        # Add this near the top of the class __init__:
+        self.log_file = os.path.expanduser("~/odom_omega_log.txt")
+        open(self.log_file, "w").close()  
 
     def encoder_callback(self, msg: Int32MultiArray):
         counts = msg.data  # [RL, RR]
@@ -73,10 +79,10 @@ class OdomPublisher(Node):
         left_dist = dist_RL
         right_dist = dist_RR
 
+        # Replace the print/info section with:
         omega_raw = (right_dist - left_dist) / self.wheel_separation
-        self.get_logger().info(
-            f"omega_raw={omega_raw:.3f}, omega_scaled={omega_raw * self.turning_gain:.3f}"
-        )       
+        with open(self.log_file, "a") as f:
+            f.write(f"{omega_raw:.4f},{omega_raw * self.turning_gain:.4f}\n")      
         # Velocities
         self.v = (left_dist + right_dist) / (2.0 * dt)
         self.omega = ((right_dist - left_dist) / self.wheel_separation) * self.turning_gain
